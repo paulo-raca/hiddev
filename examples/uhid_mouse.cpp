@@ -3,7 +3,7 @@
 #include <math.h>
 #include <time.h>
 #include <unistd.h>
-#include <thread>
+#include <future>
 
 
 #define LOG(fmt, ...) fprintf(stderr, "mouse: " fmt "\n", ##__VA_ARGS__)
@@ -46,9 +46,9 @@ struct MouseReport {
 	int8_t wheel;
 };
 
+
+
 class Mouse: public hiddev::Device {
-
-
 	virtual void getDescriptor(const uint8_t* &descriptorBuffer, uint16_t &descriptorSize) {
 		descriptorBuffer = mouse_descriptor;
 		descriptorSize = sizeof(mouse_descriptor);
@@ -78,16 +78,13 @@ class Mouse: public hiddev::Device {
 	}
 };
 
-void handleHidEvents(hiddev::UHid *uhid) {
-	printf("Thread running");
-	uhid->handleMessageLoop();
-}
+
 
 int main() {
 	printf("main");
 	Mouse mouse;
 	hiddev::UHid uhid(mouse);
-	std::thread thread(handleHidEvents, &uhid);
+	std::future<bool> future = uhid.runAsync();
 	printf("Yay!");
 
 	MouseReport mouseReport;
@@ -96,7 +93,6 @@ int main() {
 	for (int i=0; ; i++) {
 		mouseReport.xAxis = 10*sin(i/20.0);
 		mouseReport.yAxis = 10*cos(i/20.0);
-// 		mouseReport.wheel = 5*cos(i/20.0);
 		usleep(10000);
 		mouse.sendInputReport(0, (const uint8_t*) &mouseReport, sizeof(mouseReport));
 	}

@@ -4,13 +4,14 @@
 
 #include <hiddev/core.h>
 #include <linux/uhid.h>
+#include <future>
 
 namespace hiddev {
 
 	class UHid : public Driver {
 		int fd;
 	public:
-		UHid(Device &device, bool open=true);
+		UHid(Device &device);
 		~UHid();
 
 
@@ -24,7 +25,8 @@ namespace hiddev {
 		virtual bool sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
 
 		bool handleMessage();
-		bool handleMessageLoop();
+		bool run(); //open, handleMessages, close
+		std::future<bool> runAsync();
 	};
 };
 

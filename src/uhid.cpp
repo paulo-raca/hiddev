@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
+#include <thread>
 #include <hiddev/uhid.h>
 
 #define LOG(fmt, ...) fprintf(stderr, "uhid: " fmt "\n", ##__VA_ARGS__)
@@ -23,20 +24,20 @@ static hiddev::ReportType mapReportType(uint8_t reportType) {
 
 
 
-hiddev::UHid::UHid(hiddev::Device &device, bool open)
-: Driver(device)
-{
-	fd = -1;
-	if (open) {
-		this->open();
-	}
-}
+hiddev::UHid::UHid(hiddev::Device &device)
+: Driver(device), fd(-1)
+{ }
 
 hiddev::UHid::~UHid() {
 	close();
 }
 
 bool hiddev::UHid::open() {
+	if (fd >=0 ) {
+		//Already open
+		return false;
+	}
+
 	const uint8_t* hidDescriptor = nullptr;
 	uint16_t hidDescriptorLength = 0;
 	device.getDescriptor(hidDescriptor, hidDescriptorLength);
@@ -66,14 +67,13 @@ bool hiddev::UHid::open() {
 }
 
 bool hiddev::UHid::close() {
-	if (fd >= 0) {
-		::close(fd);
-		fd = -1;
-		LOG("Closed");
-		return true;
-	} else {
+	if (fd < 0)
 		return false;
-	}
+
+	::close(fd);
+	fd = -1;
+	LOG("Closed");
+	return true;
 }
 
 int hiddev::UHid::getFD() {
@@ -210,14 +210,19 @@ bool hiddev::UHid::handleMessage() {
 			return true;
 		}
 	}
-
 }
 
-bool hiddev::UHid::handleMessageLoop() {
-	 // Handle messages while no error conditions arises
+bool hiddev::UHid::run() {
+	if (!open())
+		return false;
+
 	while (handleMessage());
-	// Some error condition happened
-	return false;
+	close();
+	return true;
+}
+
+std::future<bool> hiddev::UHid::runAsync() {
+	return std::async( [](hiddev::UHid* uhid){ return uhid->run(); }, this);
 }
 
 #endif  // ifdef __linux__
