@@ -2,16 +2,16 @@
 
 #ifdef __linux__
 
-#include "hiddev.h"
+#include <hiddev/core.h>
 #include <linux/uhid.h>
 
 namespace hiddev {
 
-	class UhidDriver : public HidDriver {
+	class UHid : public Driver {
 		int fd;
 	public:
-		UhidDriver(HidDevice &device, bool open=true);
-		~UhidDriver();
+		UHid(Device &device, bool open=true);
+		~UHid();
 
 
 		bool open();

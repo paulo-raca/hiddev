@@ -14,28 +14,28 @@ namespace hiddev {
 		Report = 1
 	};
 
-	class HidDevice;
-	class HidDriver;
+	class Device;
+	class Driver;
 
 
 
-	class HidDriver {
-		friend HidDevice;
+	class Driver {
+		friend Device;
 	protected:
-		HidDevice &device;
+		Device &device;
 		virtual bool sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) = 0;
 
 	public:
-		HidDriver(HidDevice &device);
-		~HidDriver();
+		Driver(Device &device);
+		~Driver();
 	};
 
 
 
-	class HidDevice {
-		friend HidDriver;
+	class Device {
+		friend Driver;
 	protected:
-		HidDriver* driver;
+		Driver* driver;
 	public:
 		// Returns the HID descriptor.
 		// The buffers must be managed by the instance and will NOT be deallocated by the caller.

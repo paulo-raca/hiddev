@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
-#include "hiddev/uhid.h"
+#include <hiddev/uhid.h>
 
 #define LOG(fmt, ...) fprintf(stderr, "uhid: " fmt "\n", ##__VA_ARGS__)
 
@@ -23,8 +23,8 @@ static hiddev::ReportType mapReportType(uint8_t reportType) {
 
 
 
-hiddev::UhidDriver::UhidDriver(hiddev::HidDevice &device, bool open)
-: HidDriver(device)
+hiddev::UHid::UHid(hiddev::Device &device, bool open)
+: Driver(device)
 {
 	fd = -1;
 	if (open) {
@@ -32,11 +32,11 @@ hiddev::UhidDriver::UhidDriver(hiddev::HidDevice &device, bool open)
 	}
 }
 
-hiddev::UhidDriver::~UhidDriver() {
+hiddev::UHid::~UHid() {
 	close();
 }
 
-bool hiddev::UhidDriver::open() {
+bool hiddev::UHid::open() {
 	const uint8_t* hidDescriptor = nullptr;
 	uint16_t hidDescriptorLength = 0;
 	device.getDescriptor(hidDescriptor, hidDescriptorLength);
@@ -65,7 +65,7 @@ bool hiddev::UhidDriver::open() {
 	return true;
 }
 
-bool hiddev::UhidDriver::close() {
+bool hiddev::UHid::close() {
 	if (fd >= 0) {
 		::close(fd);
 		fd = -1;
@@ -76,19 +76,19 @@ bool hiddev::UhidDriver::close() {
 	}
 }
 
-int hiddev::UhidDriver::getFD() {
+int hiddev::UHid::getFD() {
 	return fd;
 }
 
-hiddev::UhidDriver::operator bool() {
+hiddev::UHid::operator bool() {
 	return fd >= 0;
 }
 
-void hiddev::UhidDriver::setDeviceAttributes(struct uhid_create2_req &attributes) {
+void hiddev::UHid::setDeviceAttributes(struct uhid_create2_req &attributes) {
 	strcpy((char*)attributes.name, "UHID Device");
 }
 
-bool hiddev::UhidDriver::sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) {
+bool hiddev::UHid::sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) {
 	if (fd < 0)
 		return false;
 
@@ -112,7 +112,7 @@ bool hiddev::UhidDriver::sendInputReport(uint8_t reportNum, const uint8_t* repor
 	return true;
 }
 
-bool hiddev::UhidDriver::handleMessage() {
+bool hiddev::UHid::handleMessage() {
 	if (fd < 0)
 		return false;
 
@@ -213,7 +213,7 @@ bool hiddev::UhidDriver::handleMessage() {
 
 }
 
-bool hiddev::UhidDriver::handleMessageLoop() {
+bool hiddev::UHid::handleMessageLoop() {
 	 // Handle messages while no error conditions arises
 	while (handleMessage());
 	// Some error condition happened

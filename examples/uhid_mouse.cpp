@@ -46,7 +46,7 @@ struct MouseReport {
 	int8_t wheel;
 };
 
-class Mouse: public hiddev::HidDevice {
+class Mouse: public hiddev::Device {
 
 
 	virtual void getDescriptor(const uint8_t* &descriptorBuffer, uint16_t &descriptorSize) {
@@ -78,7 +78,7 @@ class Mouse: public hiddev::HidDevice {
 	}
 };
 
-void handleHidEvents(hiddev::UhidDriver *uhid) {
+void handleHidEvents(hiddev::UHid *uhid) {
 	printf("Thread running");
 	uhid->handleMessageLoop();
 }
@@ -86,7 +86,7 @@ void handleHidEvents(hiddev::UhidDriver *uhid) {
 int main() {
 	printf("main");
 	Mouse mouse;
-	hiddev::UhidDriver uhid(mouse);
+	hiddev::UHid uhid(mouse);
 	std::thread thread(handleHidEvents, &uhid);
 	printf("Yay!");
 
