@@ -147,7 +147,7 @@ bool hiddev::UHid::handleMessage() {
 			uint8_t* reportBuffer = isNumberedReport ? ev.u.output.data + 1 : ev.u.output.data;
 			uint16_t reportLength = isNumberedReport ? ev.u.output.size - 1 : ev.u.output.size;
 
-			device.setReport(reportType, reportNum, reportBuffer, reportLength);
+			device.receivedOutputReport(reportType, reportNum, reportBuffer, reportLength);
 			return true;
 		}
 

@@ -49,7 +49,7 @@ namespace hiddev {
 
 		// Asynchronous IO
 		bool sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
-		virtual bool receivedOutputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
+		virtual bool receivedOutputReport(ReportType reportType, uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
 
 		// Synchronous IO
 		// on getInputReport and getFeatureReport, the buffers must be managed by the instance

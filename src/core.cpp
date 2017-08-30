@@ -32,7 +32,7 @@ bool hiddev::Device::sendInputReport(uint8_t reportNum, const uint8_t* reportBuf
 	return driver->sendInputReport(reportNum, reportBuffer, reportSize);
 }
 
-bool hiddev::Device::receivedOutputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) {
+bool hiddev::Device::receivedOutputReport(ReportType reportType, uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) {
 	// Not supported
 }
 
