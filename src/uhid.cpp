@@ -8,7 +8,8 @@
 #include <thread>
 #include <hiddev/uhid.h>
 
-#define LOG(fmt, ...) fprintf(stderr, "uhid: " fmt "\n", ##__VA_ARGS__)
+// #define LOG(fmt, ...) fprintf(stderr, "uhid: " fmt "\n", ##__VA_ARGS__)
+#define LOG(fmt, ...)
 
 static hiddev::ReportType mapReportType(uint8_t reportType) {
 	if (reportType == UHID_INPUT_REPORT)
@@ -85,7 +86,7 @@ hiddev::UHid::operator bool() {
 }
 
 void hiddev::UHid::setDeviceAttributes(struct uhid_create2_req &attributes) {
-	strcpy((char*)attributes.name, "UHID Device");
+	strcpy((char*)attributes.name, "U2F Device");
 }
 
 bool hiddev::UHid::sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) {
@@ -124,23 +125,31 @@ bool hiddev::UHid::handleMessage() {
 	}
 
 	switch (ev.type) {
-		case UHID_START:
+		case UHID_START: {
+			LOG("Flags: %lld", ev.u.start.dev_flags);
+			// This can be ignored
+			return true;
+		}
 		case UHID_STOP: {
-			// Those can be ignored
+			LOG("UHID_STOP");
+			// This can be ignored
 			return true;
 		}
 
 		case UHID_OPEN: {
+			LOG("UHID_OPEN");
 			device.start();
 			return true;
 		}
 
 		case UHID_CLOSE: {
+			LOG("UHID_CLOSE");
 			device.stop();
 			return true;
 		}
 
 		case UHID_OUTPUT: {
+			LOG("UHID_OUTPUT");
 			ReportType reportType = mapReportType(ev.u.output.rtype);
 			bool isNumberedReport = device.isNumberedReport(reportType);
 			uint8_t reportNum = isNumberedReport ? ev.u.output.data[0] : 0;
@@ -152,6 +161,7 @@ bool hiddev::UHid::handleMessage() {
 		}
 
 		case UHID_GET_REPORT: {
+			LOG("UHID_GET_REPORT");
 			uint32_t id =  ev.u.get_report.id;
 			uint8_t reportNum = ev.u.get_report.rnum;
 			ReportType reportType = mapReportType(ev.u.get_report.rtype);
@@ -186,6 +196,7 @@ bool hiddev::UHid::handleMessage() {
 		}
 
 		case UHID_SET_REPORT: {
+			LOG("UHID_SET_REPORT");
 			uint32_t id =  ev.u.set_report.id;
 			uint8_t reportNum = ev.u.set_report.rnum;
 			ReportType reportType = mapReportType(ev.u.set_report.rtype);
