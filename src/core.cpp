@@ -1,6 +1,5 @@
 #include <hiddev/core.h>
 
-
 //  =================== HID DRIVER ===================
 
 
@@ -36,10 +35,9 @@ bool hiddev::Device::receivedOutputReport(ReportType reportType, uint8_t reportN
 	// Not supported
 }
 
-bool hiddev::Device::getReport(hiddev::ReportType reportType, uint8_t reportNum, const uint8_t* &reportBuffer, uint16_t &reportSize) {
+bool hiddev::Device::getReport(hiddev::ReportType reportType, uint8_t reportNum, uint8_t* reportBuffer, uint16_t &reportSize) {
 	// Not supported
 	reportSize = 0;
-	reportBuffer = nullptr;
 	return false;
 }
 

@@ -166,7 +166,8 @@ bool hiddev::UHid::handleMessage() {
 			uint8_t reportNum = ev.u.get_report.rnum;
 			ReportType reportType = mapReportType(ev.u.get_report.rtype);
 			bool isNumberedReport = device.isNumberedReport(reportType);
-			const uint8_t* reportBuffer = nullptr;
+
+			uint8_t* reportBuffer = isNumberedReport ? ev.u.get_report_reply.data + 1 : ev.u.get_report_reply.data;
 			uint16_t reportLength = 0;
 			bool ret = device.getReport(reportType, reportNum, reportBuffer, reportLength);
 
@@ -178,12 +179,10 @@ bool hiddev::UHid::handleMessage() {
 			} else {
 				ev.u.get_report_reply.err = 0;
 				if (isNumberedReport) {
-					ev.u.get_report_reply.size = reportLength + 1;
 					ev.u.get_report_reply.data[0] = reportNum;
-					memcpy(ev.u.get_report_reply.data + 1, reportBuffer, reportLength);
+					ev.u.get_report_reply.size = reportLength + 1;
 				} else {
 					ev.u.get_report_reply.size = reportLength;
-					memcpy(ev.u.get_report_reply.data, reportBuffer, reportLength);
 				}
 			}
 

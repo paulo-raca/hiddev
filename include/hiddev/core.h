@@ -52,8 +52,7 @@ namespace hiddev {
 		virtual bool receivedOutputReport(ReportType reportType, uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
 
 		// Synchronous IO
-		// on getInputReport and getFeatureReport, the buffers must be managed by the instance
-		virtual bool getReport(ReportType reportType, uint8_t reportNum, const uint8_t* &reportBuffer, uint16_t &reportSize);
+		virtual bool getReport(ReportType reportType, uint8_t reportNum, uint8_t* reportBuffer, uint16_t &reportSize);
 		virtual bool setReport(ReportType reportType, uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
 
 		virtual bool getIdle(uint16_t &period_ms);
@@ -62,7 +61,16 @@ namespace hiddev {
 		virtual bool getProtocol(Protocol &protocol);
 		virtual bool setProtocol(Protocol protocol);
 
+		/**
+		 * Returns whenever reports of a given ReportType are indexed by a reportNum
+		 */
 		virtual bool isNumberedReport(ReportType reportType);
-	};
 
+		/**
+		 * Returns the a report size for a given ReportType / ReportNum
+		 * If the report is numbered and reportNum == 0, it should return the maximum report size for that reportType.
+		 * If there is no such report, the result should be 0 
+		 */
+		virtual uint16_t getReportSize(ReportType reportType, uint8_t reportNum) = 0;
+	};
 }

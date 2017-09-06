@@ -10,19 +10,20 @@ namespace hiddev {
 
 	class UHid : public Driver {
 		int fd;
+
+	protected:
+		virtual void setDeviceAttributes(struct uhid_create2_req &attributes);
+
 	public:
 		UHid(Device &device);
 		~UHid();
-
 
 		bool open();
 		bool close();
 		int getFD();
 		operator bool();
 
-		virtual void setDeviceAttributes(struct uhid_create2_req &attributes);
-
-		virtual bool sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize);
+		bool sendInputReport(uint8_t reportNum, const uint8_t* reportBuffer, uint16_t reportSize) override;
 
 		bool handleMessage();
 		bool run(); //open, handleMessages, close
