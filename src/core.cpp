@@ -67,8 +67,3 @@ bool hiddev::Device::setProtocol(hiddev::Protocol protocol) {
 	// Not supported
 	return false;
 }
-
-bool hiddev::Device::isNumberedReport(hiddev::ReportType reportType) {
-	// Defaults to non-numbered reports
-	return false;
-}

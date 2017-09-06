@@ -64,7 +64,7 @@ namespace hiddev {
 		/**
 		 * Returns whenever reports of a given ReportType are indexed by a reportNum
 		 */
-		virtual bool isNumberedReport(ReportType reportType);
+		virtual bool isNumberedReport(ReportType reportType) = 0;
 
 		/**
 		 * Returns the a report size for a given ReportType / ReportNum
