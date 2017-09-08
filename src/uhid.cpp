@@ -151,10 +151,9 @@ bool hiddev::UHid::handleMessage() {
 		case UHID_OUTPUT: {
 			LOG("UHID_OUTPUT");
 			ReportType reportType = mapReportType(ev.u.output.rtype);
-			bool isNumberedReport = device.isNumberedReport(reportType);
-			uint8_t reportNum = isNumberedReport ? ev.u.output.data[0] : 0;
-			uint8_t* reportBuffer = isNumberedReport ? ev.u.output.data + 1 : ev.u.output.data;
-			uint16_t reportLength = isNumberedReport ? ev.u.output.size - 1 : ev.u.output.size;
+			uint8_t reportNum = ev.u.output.data[0];
+			uint8_t* reportBuffer = ev.u.output.data + 1;
+			uint16_t reportLength = ev.u.output.size - 1;
 
 			device.receivedOutputReport(reportType, reportNum, reportBuffer, reportLength);
 			return true;
@@ -199,9 +198,9 @@ bool hiddev::UHid::handleMessage() {
 			uint32_t id =  ev.u.set_report.id;
 			uint8_t reportNum = ev.u.set_report.rnum;
 			ReportType reportType = mapReportType(ev.u.set_report.rtype);
-			bool isNumberedReport = device.isNumberedReport(reportType);
-			const uint8_t* reportBuffer = ev.u.set_report.data;
-			uint16_t reportLength = ev.u.set_report.size;
+			const uint8_t* reportBuffer = ev.u.set_report.data + 1;
+			uint16_t reportLength = ev.u.set_report.size - 1;
+
 			bool ret = device.setReport(reportType, reportNum, reportBuffer, reportLength);
 
 			ev.type = UHID_SET_REPORT_REPLY;
